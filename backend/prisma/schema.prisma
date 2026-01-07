@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ORGANIZER
+}
+
+enum EventStatus {
+  OPEN
+  CLOSED
+}
+
+enum AttendanceMethod {
+  QR
+  TEXT
+}
+
+model User {
+  id           String       @id @default(uuid())
+  name         String
+  email        String       @unique
+  passwordHash String
+  role         Role         @default(ORGANIZER)
+  createdAt    DateTime     @default(now())
+  groups       EventGroup[]
+}
+
+model EventGroup {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  ownerId     String
+  createdAt   DateTime @default(now())
+
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  events      Event[]
+}
+
+model Event {
+  id           Int         @id @default(autoincrement())
+  groupId      Int
+  title        String
+  description  String?
+  startTime    DateTime
+  endTime      DateTime
+  status       EventStatus @default(CLOSED)
+  statusManual Boolean     @default(false)
+  accessCode   String      @unique
+  qrDataUrl    String?
+  createdAt    DateTime    @default(now())
+
+  group        EventGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  attendances  Attendance[]
+}
+
+model Participant {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String?
+  createdAt DateTime @default(now())
+  attendances Attendance[]
+}
+
+model Attendance {
+  id            Int              @id @default(autoincrement())
+  eventId       Int
+  participantId Int
+  joinedAt      DateTime         @default(now())
+  method        AttendanceMethod
+
+  event        Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  participant  Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([participantId])
+}
