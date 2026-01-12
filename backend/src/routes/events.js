@@ -15,6 +15,10 @@ router.post("/event-groups/:groupId/events", async (req, res) => {
     return res.status(400).json({ message: "titlu, start, sfarsit obligatorii" });
   }
 
+    if (startTime > endTime) {
+    return res.status(400).json({ message: "Data de start nu poate fi dupa data de sfarsit" });
+  }
+
   //verf daca grupul exista si apartine userului
   const group = await prisma.eventGroup.findFirst({ where: { id: groupId, ownerId: userId } });
   if (!group) return res.status(404).json({ message: "Grupul nu a fost gasit" });
