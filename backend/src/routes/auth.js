@@ -14,6 +14,15 @@ router.post("/register", async (req, res) => {
   const exists = await prisma.user.findUnique({ where: { email } });
   if (exists) return res.status(409).json({ message: "Mailul e deja utilizat" });
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: "Format email invalid" });
+  }
+
+    if (password.length<5) {
+    return res.status(400).json({ message: "Format parola invalida" });
+  }
+  
   const passwordHash = await bcrypt.hash(password, 10);
   const user = await prisma.user.create({ data: { name, email, passwordHash }, select: { id: true, name: true, email: true } });
 
