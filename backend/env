@@ -1,0 +1,5 @@
+PORT=4000
+JWT_SECRET=echipa_5_proiect_tw
+DATABASE_URL="postgresql://postgres.ejxczyniekphhepbzqfn:Echipa5123!@aws-1-eu-west-1.pooler.supabase.com:5432/postgres"
+FRONTEND_ORIGIN=http://localhost:5173,http://192.168.0.157:5173
+TIME_API_URL=https://worldtimeapi.org/api/timezone/Europe/Bucharest
